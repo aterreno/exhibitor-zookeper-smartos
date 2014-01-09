@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<service_bundle type='manifest' name='export'>
+  <service name='application/exhibitor' type='service' version='0'>
+    <single_instance/>
+    <instance name='exhibitor' enabled='true'>
+      <dependency name='multi-user-server' grouping='require_all' restart_on='none' type='service'>
+        <service_fmri value='svc:/milestone/multi-user-server'/>
+      </dependency>
+      <method_context working_directory='/opt/molsfw/exhibitor/'>
+        <method_credential group='zooman' user='zooman'/>
+        <method_environment>          
+          <envvar name='JAVA_HOME' value='/opt/molsfw/java/latest7'/>
+          <envvar name='PATH' value='/opt/molsfw/java/latest7/bin:/var/cfengine/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin'/>
+          <envvar name='LD_LIBRARY_PATH' value='/opt/local/gcc47/x86_64-sun-solaris2.11/lib/amd64'/>
+        </method_environment>
+      </method_context>
+      <exec_method name='start' type='method' exec='java -jar /opt/molsfw/exhibitor/exhibitor-1.5.1.jar --headingtext MOL --nodemodification true --filesystembackup true -c file --fsconfigdir /opt/molsfw/zooman --defaultconfig /opt/molsfw/zooman/exhibitor.properties' timeout_seconds='0'/>
+      <exec_method name='stop' type='method' exec=':kill -TERM' timeout_seconds='30'/>
+      <property_group name='startd' type='framework'>
+        <propval name='duration' type='astring' value='child'/>
+      </property_group>
+    </instance>
+    <stability value='Evolving'/>
+    <template>
+      <common_name>
+        <loctext xml:lang='C'>Exhibitor Instance</loctext>
+      </common_name>
+    </template>
+  </service>
+</service_bundle>
